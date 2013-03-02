@@ -1,4 +1,4 @@
-vid = VideoReader('Meu Filme5.avi');
+vid = VideoReader('Pool1.avi');
 
 nFrames = vid.NumberOfFrames;
 vidHeight = vid.Height;
@@ -58,8 +58,8 @@ figure(3);
 imshow(I);
 
 %Descobrir o centro da bola
+f=1;
 for i=1:vidHeight
-    f=1;
     for j=1:vidWidth
         if(I(i,j)==1)
             pos_bola1(f)=i;
@@ -167,8 +167,8 @@ imwrite(imagem2,'taco_segmentado1.png','png');
 
 %Descobrir ponta do taco
 %Descobrir o centro da bola
+f=1;
 for i=1:vidHeight
-    f=1;
     for j=1:vidWidth
         if(L(i,j)==1)
             pos_taco1(f)=i;
@@ -184,11 +184,25 @@ for i=1:tam(2)
     SAD = sum(sum(abs(DIF)));
     if(SAD<DIF2)
         DIF2 = SAD;
-        ponta_x=pos_taco2;
-        ponta_y=pos_taco1;
+        ponta_x=pos_taco2(i);
+        ponta_y=pos_taco1(i);
     end    
 end    
- 
+
+x = 1:vidWidth;
+figure(10);
+imshow(mov(1).cdata);
+colormap gray
+hold on;
+if(bola_coluna - ponta_x == 0)
+m = (bola_linha - ponta_y)/1;
+else
+    m = (bola_linha - ponta_y)/(bola_coluna - ponta_x);
+end    
+y = (m*(x-ponta_x))+ponta_y;
+plot(x,y,'.');
+axis([0 vidWidth 0 vidHeight])
+hold on;
 
 
 % Size a figure based on the video's width and height.

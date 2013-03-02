@@ -1,4 +1,4 @@
-vid = VideoReader('Meu Filme5.avi');
+vid = VideoReader('Pool0.avi');
 
 nFrames = vid.NumberOfFrames;
 vidHeight = vid.Height;
@@ -91,7 +91,7 @@ imwrite(imagem1,'bola_segmentada1.png','png');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           Segmentação taco
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-BW = im2bw(imagem2,0.14);
+BW = im2bw(imagem2,0.13);
 for i=1:vidHeight
     for j=1:vidWidth
         if(BW(i,j)==1)
