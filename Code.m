@@ -1,21 +1,20 @@
-xyloObj = VideoReader('Meu Filme5.avi');
+vid = VideoReader('Meu Filme5.avi');
 
-nFrames = xyloObj.NumberOfFrames;
-vidHeight = xyloObj.Height;
-vidWidth = xyloObj.Width;
+nFrames = vid.NumberOfFrames;
+vidHeight = vid.Height;
+vidWidth = vid.Width;
 
 % Preallocate movie structure.
 mov(1:nFrames) = ...
     struct('cdata', zeros(vidHeight, vidWidth, 3, 'uint8'),...
-           'colormap', []);
+    'colormap', []);
 
 % Read one frame at a time.
 for k = 1 : nFrames
-    mov(k).cdata = read(xyloObj, k);
+    mov(k).cdata = read(vid, k);
 end
 imagem1= mov(1).cdata;
 imagem2= mov(1).cdata;
-imagem_cinza = rgb2gray(imagem2);
 figure(1);
 imshow(imagem1);
 figure(2);
@@ -45,30 +44,30 @@ O2 = imopen(O1,B);
 figure(3);
 imshow(O2);
 
-    for i=1:vidHeight
-        for j=1:vidWidth
-            I(i,j)=O1(i,j)-O2(i,j);
-        end
+for i=1:vidHeight
+    for j=1:vidWidth
+        I(i,j)=O1(i,j)-O2(i,j);
     end
+end
 
 %Elemento estruturante
 B = strel('disk',4,0);
 %Abertura para permanecer somente a bola na imagem
 I = imopen(I,B);
 figure(3);
-imshow(I);    
-    
+imshow(I);
+
 %Descobrir o centro da bola
+f=1;
 for i=1:vidHeight
-  f=1;
-  for j=1:vidWidth
-         if(I(i,j)==1)
-           pos_bola1(f)=i;
-           pos_bola2(f)=j;
-           f=f+1;
-         end
-  end
-end      
+    for j=1:vidWidth
+        if(I(i,j)==1)
+            pos_bola1(f)=i;
+            pos_bola2(f)=j;
+            f=f+1;
+        end
+    end
+end
 
 MAX=max(pos_bola1);
 MIN=min(pos_bola1);
@@ -92,16 +91,16 @@ imwrite(imagem1,'bola_segmentada1.png','png');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           Segmentação taco
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-BW = im2bw(imagem_cinza,0.14);
+BW = im2bw(imagem2,0.14);
 for i=1:vidHeight
-  for j=1:vidWidth
-         if(BW(i,j)==1)
-                BW(i,j)=0;
-         else
-             BW(i,j)=1;
-         end
-  end
-end 
+    for j=1:vidWidth
+        if(BW(i,j)==1)
+            BW(i,j)=0;
+        else
+            BW(i,j)=1;
+        end
+    end
+end
 
 %elimina ojetos com quantidade maior de pixels que o limiar
 Limiar1  =  200;
@@ -139,13 +138,71 @@ B = strel('square',2);
 O2 = imdilate(O2,B);
 figure(4);
 imshow(O2);
+for i=1:vidHeight
+    for j=1:vidWidth
+        L(i,j)=L(i,j)-O2(i,j);
+    end
+end
+figure(1)
+L = uint8(L * 100);
+imshow(L);
+L = im2bw(L,0);
+imshow(L);
+%Mutiplicaçã imagem binaria pela inicial para estração do cookie
+for RGB=1:3
     for i=1:vidHeight
         for j=1:vidWidth
-            L(i,j)=L(i,j)-O2(i,j);
+            imagem2(i,j,RGB)= imagem2(i,j)*uint8(L(i,j));
         end
     end
-figure(1)
-imshow(uint8(L * 100));
+end
+
+figure(5);
+imshow(imagem2);
+imwrite(imagem2,'taco_segmentado1.png','png');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   Criando Vetor chute de Movimento
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Descobrir ponta do taco
+%Descobrir o centro da bola
+f=1;
+for i=1:vidHeight
+    for j=1:vidWidth
+        if(L(i,j)==1)
+            pos_taco1(f)=i;
+            pos_taco2(f)=j;
+            f=f+1;
+        end
+    end
+end
+tam = size(pos_taco1);
+DIF2 = 9999;
+for i=1:tam(2)
+    DIF = [bola_linha,bola_coluna] - [pos_taco1(i),pos_taco2(i)];
+    SAD = sum(sum(abs(DIF)));
+    if(SAD<DIF2)
+        DIF2 = SAD;
+        ponta_x=pos_taco2(i);
+        ponta_y=pos_taco1(i);
+    end    
+end    
+
+x = 1:vidWidth;
+figure(10);
+imshow(mov(1).cdata);
+colormap gray
+hold on;
+if(bola_coluna - ponta_x == 0)
+m = (bola_linha - ponta_y)/1;
+else
+    m = (bola_linha - ponta_y)/(bola_coluna - ponta_x);
+end    
+y = (m*(x-ponta_x))+ponta_y;
+plot(x,y,'.');
+axis([0 vidWidth 0 vidHeight])
+hold on;
 
 
 % Size a figure based on the video's width and height.
@@ -153,4 +210,4 @@ hf = figure;
 set(hf, 'position', [150 150 vidWidth vidHeight])
 
 % Play back the movie once at the video's frame rate.
-movie(hf, mov, 1, xyloObj.FrameRate);
+movie(hf, mov, 1, vid.FrameRate);
