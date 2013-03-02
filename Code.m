@@ -15,6 +15,7 @@ for k = 1 : nFrames
 end
 imagem1= mov(1).cdata;
 imagem2= mov(1).cdata;
+imagem_cinza = rgb2gray(imagem2);
 figure(1);
 imshow(imagem1);
 figure(2);
@@ -44,23 +45,23 @@ O2 = imopen(O1,B);
 figure(3);
 imshow(O2);
 
-    for i=1:vidHeight-1
-        for j=1:vidWidth-1
+    for i=1:vidHeight
+        for j=1:vidWidth
             I(i,j)=O1(i,j)-O2(i,j);
         end
     end
 
 %Elemento estruturante
-B = strel('disk',3,0);
+B = strel('disk',4,0);
 %Abertura para permanecer somente a bola na imagem
 I = imopen(I,B);
 figure(3);
 imshow(I);    
     
 %Descobrir o centro da bola
-for i=1:vidHeight-1
+for i=1:vidHeight
   f=1;
-  for j=1:vidWidth-1
+  for j=1:vidWidth
          if(I(i,j)==1)
            pos_bola1(f)=i;
            pos_bola2(f)=j;
@@ -78,8 +79,8 @@ bola_coluna=MIN+floor((MAX-MIN)/2);
 
 %Mutiplicaçã imagem binaria pela inicial para estração do cookie
 for RGB=1:3
-    for i=1:vidHeight-1
-        for j=1:vidWidth-1
+    for i=1:vidHeight
+        for j=1:vidWidth
             imagem1(i,j,RGB)= imagem1(i,j)*uint8(I(i,j));
         end
     end
@@ -91,27 +92,21 @@ imwrite(imagem1,'bola_segmentada1.png','png');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           Segmentação taco
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure(3);
-BW = im2bw(imagem2,0.04);
+BW = im2bw(imagem_cinza,0.117);
+for i=1:vidHeight
+  for j=1:vidWidth
+         if(BW(i,j)==1)
+                BW(i,j)=0;
+         else
+             BW(i,j)=1;
+         end
+  end
+end 
+
 imshow(BW);
+L = bwlabel(BW,8)
+[r,c] = find(L == 2)
 
-%Dilatação para recuperar a bola para eliminar o cookie imagem
-O = strel('disk',4,0);
-O = imdilate(I,O);
-figure(5);
-imshow(O);
-
-%Mutiplicaçã imagem binaria pela inicial para estração do cookie
-for RGB=1:3
-    for i=1:vidHeight-1
-        for j=1:vidWidth-1
-            imagem2(i,j,RGB)= imagem2(i,j)*uint8(O(i,j));
-        end
-    end
-end
-figure(6);
-imshow(imagem2);
-%imwrite(imagem,'taco_segmentada1.png','png');
 
 % Size a figure based on the video's width and height.
 hf = figure;
