@@ -102,20 +102,33 @@ for i=1:vidHeight
          end
   end
 end 
-Limiar  =  1600;
+
+%elimina ojetos com quantidade maior de pixels que o limiar
+Limiar  =  500;
 imshow(BW);
 L = bwlabel(BW,8);
-for i = min(L) : max(L)
-    matriz = find(L == i);
-    if(sum(sum(matriz)) > Limiar)
-        L = L - matriz;
+min(min(L))
+max(max(L))
+
+for i = min(min(L)) : max(max(L))
+    [X, Y] = find(L == i);
+    [x, y] = size(X);
+    if(x > Limiar)
+        for j = 1:vidHeight
+            for k = 1:vidWidth
+                if(L(j, k) == i)
+                    L(j, k) = 0;
+                end
+            end
+        end
     end
 end
+figure(1)
+imshow(uint8(L * 100));
 
+%fim da rotina        
 
-        
-
-[r,c] = find(L == 2)
+%[r,c] = find(L == 2)
 
 
 % Size a figure based on the video's width and height.
