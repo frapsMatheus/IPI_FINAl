@@ -1,5 +1,6 @@
+clear all
+clc
 vid = VideoReader('Pool2.avi');
-
 nFrames = vid.NumberOfFrames;
 vidHeight = vid.Height;
 vidWidth = vid.Width;
