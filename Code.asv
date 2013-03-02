@@ -102,17 +102,13 @@ for i=1:vidHeight
          end
   end
 end 
-Limiar  =  1600;
+
 imshow(BW);
-L = bwlabel(BW,8);
+L = bwlabel(BW,8)
 for i = min(L) : max(L)
-    matriz = find(L == i);
+    matriz = find(L == i)
     if(sum(sum(matriz)) > Limiar)
-        L = L - matriz;
-    end
 end
-
-
         
 
 [r,c] = find(L == 2)
