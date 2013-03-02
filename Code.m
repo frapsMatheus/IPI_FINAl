@@ -1,4 +1,4 @@
-vid = VideoReader('Pool1.avi');
+vid = VideoReader('Pool2.avi');
 
 nFrames = vid.NumberOfFrames;
 vidHeight = vid.Height;
@@ -32,7 +32,7 @@ figure(3);
 imshow(I);
 
 %Dilatação para recuperar a bola
-O = strel('disk',4,0);
+O = strel('disk',11,0);
 O1 = imdilate(I,O);
 figure(4);
 imshow(O1);
