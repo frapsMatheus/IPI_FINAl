@@ -1,4 +1,4 @@
-vid = VideoReader('Pool0.avi');
+vid = VideoReader('Pool1.avi');
 
 nFrames = vid.NumberOfFrames;
 vidHeight = vid.Height;
@@ -197,9 +197,9 @@ hold on;
 if(bola_coluna - ponta_x == 0)
 m = (bola_linha - ponta_y)/1;
 else
-    m = (bola_linha - ponta_y)/(bola_coluna - ponta_x);
+    m = (ponta_y - bola_linha)/(ponta_x - bola_coluna);
 end    
-y = (m*(x-ponta_x))+ponta_y;
+y = (m*(x-bola_coluna))+bola_linha;
 plot(x,y,'.');
 axis([0 vidWidth 0 vidHeight])
 hold on;
