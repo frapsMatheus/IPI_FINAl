@@ -92,7 +92,7 @@ imwrite(imagem1,'bola_segmentada1.png','png');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           Segmentação taco
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-BW = im2bw(imagem_cinza,0.117);
+BW = im2bw(imagem_cinza,0.14);
 for i=1:vidHeight
   for j=1:vidWidth
          if(BW(i,j)==1)
@@ -104,7 +104,8 @@ for i=1:vidHeight
 end 
 
 %elimina ojetos com quantidade maior de pixels que o limiar
-Limiar  =  500;
+Limiar1  =  200;
+Limiar2  =  80;
 imshow(BW);
 L = bwlabel(BW,8);
 min(min(L))
@@ -113,7 +114,7 @@ max(max(L))
 for i = min(min(L)) : max(max(L))
     [X, Y] = find(L == i);
     [x, y] = size(X);
-    if(x > Limiar)
+    if(x > Limiar1 || x<Limiar2)
         for j = 1:vidHeight
             for k = 1:vidWidth
                 if(L(j, k) == i)
@@ -126,9 +127,25 @@ end
 figure(1)
 imshow(uint8(L * 100));
 
-%fim da rotina        
+%Elemento estruturante
+B = strel('rectangle',(9:-8:1));
+%Abertura para diminuir os erros
+O2 = imopen(L,B);
+figure(3);
+imshow(O2);
 
-%[r,c] = find(L == 2)
+%Correção de eliminicação de borda
+B = strel('square',2);
+O2 = imdilate(O2,B);
+figure(4);
+imshow(O2);
+    for i=1:vidHeight
+        for j=1:vidWidth
+            L(i,j)=L(i,j)-O2(i,j);
+        end
+    end
+figure(1)
+imshow(uint8(L * 100));
 
 
 % Size a figure based on the video's width and height.
