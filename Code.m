@@ -167,7 +167,6 @@ imwrite(imagem2,'taco_segmentado1.png','png');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Descobrir ponta do taco
-%Descobrir o centro da bola
 f=1;
 for i=1:vidHeight
     for j=1:vidWidth
@@ -180,6 +179,7 @@ for i=1:vidHeight
 end
 tam = size(pos_taco1);
 DIF2 = 9999;
+%Procura ponto mais perto da bola
 for i=1:tam(2)
     DIF = [bola_linha,bola_coluna] - [pos_taco1(i),pos_taco2(i)];
     SAD = sum(sum(abs(DIF)));
@@ -189,7 +189,7 @@ for i=1:tam(2)
         ponta_y=pos_taco1(i);
     end    
 end    
-
+%Calculo de equação da reta
 x = 1:vidWidth;
 figure(10);
 imshow(mov(1).cdata);
