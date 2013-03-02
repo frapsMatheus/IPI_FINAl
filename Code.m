@@ -58,14 +58,23 @@ figure(3);
 imshow(I);    
     
 %Descobrir o centro da bola
-%Elemento estruturante
-B = strel(I);
-%Abertura para permanecer somente a bola na imagem
-I = imerode(I,B);
-figure(3);
-imshow(I);    
-    
+for i=1:vidHeight-1
+  f=1;
+  for j=1:vidWidth-1
+         if(I(i,j)==1)
+           pos_bola1(f)=i;
+           pos_bola2(f)=j;
+           f=f+1;
+         end
+  end
+end      
 
+MAX=max(pos_bola1);
+MIN=min(pos_bola1);
+bola_linha=MIN+floor((MAX-MIN)/2);
+MAX=max(pos_bola2);
+MIN=min(pos_bola2);
+bola_coluna=MIN+floor((MAX-MIN)/2);
 
 %Mutiplicaçã imagem binaria pela inicial para estração do cookie
 for RGB=1:3
@@ -75,10 +84,6 @@ for RGB=1:3
         end
     end
 end
-
-
-
-
 
 %figure(5);
 imshow(imagem1);
