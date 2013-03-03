@@ -275,7 +275,13 @@ xa = bola_coluna;
 ya = bola_linha;
 traking_count=0;
 %Espelhamento
-for x = vidWidth:-1:1;
+if(m>0)
+    x=vidWidth:-1:1;
+else
+   x=1:vidWidth; 
+end    
+
+for x=x
     y2(x) = round((m*(x-xa))+ya);
     if(y2(x)==bola_linha && x==bola_coluna)
        traking_count=1;   
@@ -307,4 +313,5 @@ hold on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                   Traking
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-detect(traking_prox_x,bola_coluna);
+figure();
+detect(nFrames,traking_prox_x,bola_coluna);

@@ -21,7 +21,7 @@ foremm = bwmorph(fore,'erode',2); %2 time
 if(traking_prox_x>bola_coluna);
     for i=1:MR
         for j=1:MC
-            if(j<bola_coluna);
+            if(j<bola_coluna+round(bola_coluna/3));
                 foremm(i,j)=0;
             end
         end
@@ -29,7 +29,7 @@ if(traking_prox_x>bola_coluna);
 else
     for i=1:MR
         for j=1:MC
-            if(i>bola_coluna);
+            if(i>bola_coluna -2*(MC-bola_coluna)+round((MC-bola_coluna)/3));
                 foremm(i,j)=0;
             end
         end

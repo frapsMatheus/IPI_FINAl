@@ -1,14 +1,14 @@
-function detect(traking_prox_x,bola_coluna)
+function detect(nFrames,traking_prox_x,bola_coluna)
 % compute the background image
 Imzero = zeros(240,320,3);
-for i = 1:10
+for i = 1:5
 Im{i} = double(imread(['DATA/',int2str(i),'.png']));
 Imzero = Im{i}+Imzero;
 end
-Imback = Imzero/10;
+Imback = Imzero/5;
 [MR,MC,Dim] = size(Imback);
 % loop over all images
-for i = 1 : 39
+for i = 1 : nFrames
   % load image
   Im = (imread(['DATA/',int2str(i), '.png']));
   imshow(Im)
