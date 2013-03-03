@@ -1,5 +1,5 @@
 % extracts the center (cc,cr) and radius of the largest blob
-function [cc,cr,radius,flag]=extractball(Imwork,Imback,index)%,fig1,fig2,fig3,fig15,index)
+function [cc,cr,radius,flag]=extractball(Imwork,Imback,index,traking_prox_y,bola_linha)%,fig1,fig2,fig3,fig15,index)
   
   cc = 0;
   cr = 0;
@@ -17,13 +17,28 @@ function [cc,cr,radius,flag]=extractball(Imwork,Imback,index)%,fig1,fig2,fig3,fi
      | (abs(Imwork(:,:,3) - Imback(:,:,3)) > 10);  
  
   % Morphology Operation  erode to remove small noise
-  foremm = bwmorph(fore,'erode',2); %2 time
-  
-  % select largest object
-  labeled = bwlabel(foremm,4);
+  foremm = bwmorph(fore,'erode',2); %2 time  
   figure();
-  imshow(labeled);
-  hold on;
+  imshow(foremm);
+  if(traking_prox_y>bola_linha);
+    for i=1:MR
+    for j=1:MC
+        if(i<bola_linha);
+        foremm(i,j)=0;
+        end
+    end    
+    end
+  else
+    for i=1:MR
+    for j=1:MC
+        if(i>bola_linha);
+        foremm(i,j)=0;
+        end
+    end    
+    end      
+  end
+  % select largest object
+  labeled = bwlabel(foremm,4);  
   stats = regionprops(labeled,['basic']);%basic mohem nist
   [N,W] = size(stats);
   if N < 1
@@ -47,6 +62,7 @@ function [cc,cr,radius,flag]=extractball(Imwork,Imback,index)%,fig1,fig2,fig3,fi
       end
     end
   end
+  
 
   % make sure that there is at least 1 big region
   if stats(1).Area < 100 

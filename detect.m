@@ -1,24 +1,21 @@
-function detect(frames)
-%detect
-clear,clc
+function detect(traking_prox_y,bola_linha)
 % compute the background image
 Imzero = zeros(240,320,3);
-for i = 1:5
-Im{i} = frames(i);
+for i = 1:10
+Im{i} = double(imread(['DATA/',int2str(i),'.png']));
 Imzero = Im{i}+Imzero;
 end
-Imback = Imzero/5;
+Imback = Imzero/10;
 [MR,MC,Dim] = size(Imback);
-
 % loop over all images
-for i = 1 : 60
+for i = 1 : 39
   % load image
-  Im = frames; 
+  Im = (imread(['DATA/',int2str(i), '.png']));
   imshow(Im)
   Imwork = double(Im);
 
   %extract ball
-  [cc(i),cr(i),radius,flag] = extractball(Imwork,Imback,i);%,fig1,fig2,fig3,fig15,i);
+  [cc(i),cr(i),radius,flag] = extractball(Imwork,Imback,i,traking_prox_y,bola_linha);%,fig1,fig2,fig3,fig15,i);
   if flag==0
     continue
   end
