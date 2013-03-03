@@ -14,15 +14,16 @@ mov(1:nFrames) = ...
 for k = 1 : nFrames
     mov(k).cdata = read(vid, k);
 end
-imagem1= mov(1).cdata;
-imagem2= mov(1).cdata;
+bola= mov(1).cdata;
+taco= mov(1).cdata;
+borda= mov(1).cdata;
 figure(1);
-imshow(imagem1);
+imshow(bola);
 figure(2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           Segmentação bola
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-BW = im2bw(imagem1,graythresh(imagem1));
+BW = im2bw(bola,graythresh(bola));
 imshow(BW);
 
 %Elemento estruturante
@@ -81,18 +82,18 @@ bola_coluna=MIN+floor((MAX-MIN)/2);
 for RGB=1:3
     for i=1:vidHeight
         for j=1:vidWidth
-            imagem1(i,j,RGB)= imagem1(i,j)*uint8(I(i,j));
+            bola(i,j,RGB)= bola(i,j)*uint8(I(i,j));
         end
     end
 end
 
 %figure(5);
-imshow(imagem1);
-imwrite(imagem1,'bola_segmentada1.png','png');
+imshow(bola);
+imwrite(bola,'bola_segmentada1.png','png');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           Segmentação taco
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-BW = im2bw(imagem2,0.13);
+BW = im2bw(taco,0.13);
 for i=1:vidHeight
     for j=1:vidWidth
         if(BW(i,j)==1)
@@ -153,14 +154,70 @@ imshow(L);
 for RGB=1:3
     for i=1:vidHeight
         for j=1:vidWidth
-            imagem2(i,j,RGB)= imagem2(i,j)*uint8(L(i,j));
+            taco(i,j,RGB)= taco(i,j)*uint8(L(i,j));
         end
     end
 end
 
 figure(5);
-imshow(imagem2);
-imwrite(imagem2,'taco_segmentado1.png','png');
+imshow(taco);
+imwrite(taco,'taco_segmentado1.png','png');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                           Detectar bordas mesa
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+for i=1:vidHeight
+        for j=1:vidWidth
+            if(borda(i,j,1)<120||borda(i,j,2)>130||borda(i,j,3)>115)
+            for RGB=1:3
+                borda(i,j,RGB)= 0;
+            end
+            else
+            for RGB=1:3
+               borda(i,j,RGB)= 255;
+            end    
+            end
+        end
+end
+figure(8);
+imshow(borda);
+BW = im2bw(borda,graythresh(borda));
+imshow(BW);
+%Elemento estruturante
+B = strel('rectangle',(2:8:10));
+%Abertura para diminuir os erros
+O2 = imopen(BW,B);
+figure(3);
+imshow(O2);
+
+%Dilatação para recuperar a bola
+B = strel('rectangle',(4:2:6));
+O2 = imdilate(O2,B);
+figure(4);
+imshow(O2);
+
+%elimina ojetos com quantidade maior de pixels que o limiar
+Limiar1  =  800;
+L_borda = bwlabel(O2,8);
+min(min(L_borda))
+max(max(L_borda))
+
+for i = min(min(L_borda)) : max(max(L_borda))
+    [X, Y] = find(L_borda == i);
+    [x, y] = size(X);
+    if(x < Limiar1)
+        for j = 1:vidHeight
+            for k = 1:vidWidth
+                if(L_borda(j, k) == i)
+                    L_borda(j, k) = 0;
+                end
+            end
+        end
+    end
+end
+borda = im2bw(uint8(L_borda * 100),graythresh(uint8(L_borda * 100)));
+imwrite(borda,'Borda_segmentada.png','png');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                   Criando Vetor chute de Movimento
