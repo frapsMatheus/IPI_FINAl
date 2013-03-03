@@ -1,6 +1,6 @@
 clear all
 clc
-vid = VideoReader('Pool1.avi');
+vid = VideoReader('Pool2.avi');
 nFrames = vid.NumberOfFrames;
 vidHeight = vid.Height;
 vidWidth = vid.Width;
@@ -280,7 +280,7 @@ for x = vidWidth:-1:1;
     if(y2(x)==bola_linha && x==bola_coluna)
        traking_count=1;   
     elseif(traking_count==1)
-        traking_prox_y=y2(x);
+        traking_prox_x=x;
         traking_count=0;
     end    
     if(y2(x)<1||y2(x)>240)
@@ -307,4 +307,4 @@ hold on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                   Traking
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-detect(traking_prox_y,bola_linha);
+detect(traking_prox_x,bola_coluna);

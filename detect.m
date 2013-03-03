@@ -1,4 +1,4 @@
-function detect(traking_prox_y,bola_linha)
+function detect(traking_prox_x,bola_coluna)
 % compute the background image
 Imzero = zeros(240,320,3);
 for i = 1:10
@@ -15,7 +15,7 @@ for i = 1 : 39
   Imwork = double(Im);
 
   %extract ball
-  [cc(i),cr(i),radius,flag] = extractball(Imwork,Imback,i,traking_prox_y,bola_linha);%,fig1,fig2,fig3,fig15,i);
+  [cc(i),cr(i),radius,flag] = extractball(Imwork,Imback,i,traking_prox_x,bola_coluna);%,fig1,fig2,fig3,fig15,i);
   if flag==0
     continue
   end
