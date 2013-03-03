@@ -311,9 +311,8 @@ for x = vidWidth:-1:1;
     elseif(borda(y2(x),x)==1)
         %Espelho angulo de entrada igual 90-alfa, angulo dentro do triangulo =
         %alfa, angulo externo = 180-alfa;
-        m= tan(180-alfa);
-        ya = y2(x);
-        xa = x;
+        m= -m;
+        xa = xa-(2*(xa-x));
         
     end
 end
