@@ -1,6 +1,6 @@
 clear all
 clc
-vid = VideoReader('Pool2.avi');
+vid = VideoReader('Pool1.avi');
 nFrames = vid.NumberOfFrames;
 vidHeight = vid.Height;
 vidWidth = vid.Width;
@@ -168,17 +168,17 @@ imwrite(taco,'taco_segmentado1.png','png');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 for i=1:vidHeight
-        for j=1:vidWidth
-            if(borda(i,j,1)<120||borda(i,j,2)>130||borda(i,j,3)>115)
+    for j=1:vidWidth
+        if(borda(i,j,1)<120||borda(i,j,2)>130||borda(i,j,3)>115)
             for RGB=1:3
                 borda(i,j,RGB)= 0;
             end
-            else
+        else
             for RGB=1:3
-               borda(i,j,RGB)= 255;
-            end    
+                borda(i,j,RGB)= 255;
             end
         end
+    end
 end
 figure(8);
 imshow(borda);
@@ -216,7 +216,40 @@ for i = min(min(L_borda)) : max(max(L_borda))
         end
     end
 end
-borda = im2bw(uint8(L_borda * 100),graythresh(uint8(L_borda * 100)));
+borda = im2bw(uint8(L_borda * 100),0.01);
+
+imshow(borda);
+
+%Elemento estruturante
+B = strel('rectangle',(2:4:6));
+%Erosão para corresão de bordas
+borda = imerode(borda,B);
+figure(3);
+imshow(borda);
+
+%elimina ojetos com quantidade maior de pixels que o limiar
+Limiar1  =  800;
+L_borda = bwlabel(borda,8);
+min(min(L_borda))
+max(max(L_borda))
+
+for i = min(min(L_borda)) : max(max(L_borda))
+    [X, Y] = find(L_borda == i);
+    [x, y] = size(X);
+    if(x < Limiar1)
+        for j = 1:vidHeight
+            for k = 1:vidWidth
+                if(L_borda(j, k) == i)
+                    L_borda(j, k) = 0;
+                end
+            end
+        end
+    end
+end
+borda = im2bw(uint8(L_borda * 100),0.01);
+figure(1);
+imshow(borda);
+
 imwrite(borda,'Borda_segmentada.png','png');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -244,8 +277,8 @@ for i=1:tam(2)
         DIF2 = SAD;
         ponta_x=pos_taco2(i);
         ponta_y=pos_taco1(i);
-    end    
-end    
+    end
+end
 %Calculo de equação da reta
 x = 1:vidWidth;
 figure(10);
@@ -253,14 +286,51 @@ imshow(mov(1).cdata);
 colormap gray
 hold on;
 if(bola_coluna - ponta_x == 0)
-m = (bola_linha - ponta_y)/1;
+    m = (bola_linha - ponta_y)/1;
 else
     m = (ponta_y - bola_linha)/(ponta_x - bola_coluna);
-end    
+end
 y = (m*(x-bola_coluna))+bola_linha;
 plot(x,y,'.');
 axis([0 vidWidth 0 vidHeight])
 hold on;
+
+alfa = atan(m);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   Movimento com espelhamento
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+xa = bola_coluna;
+ya = bola_linha;
+bateu_uma_vez=0;
+%Espelhamento
+for x = vidWidth:-1:1;
+    y2(x) = round((m*(x-xa))+ya);
+    if(y2(x)<1||y2(x)>240)
+        y2(x)=0;
+    elseif(borda(y2(x),x)==1)
+        %Espelho angulo de entrada igual 90-alfa, angulo dentro do triangulo =
+        %alfa, angulo externo = 180-alfa;
+        m= tan(180-alfa);
+        ya = y2(x);
+        xa = x;
+        
+    end
+end
+
+%Calculo de equação da reta
+x = 1:vidWidth;
+figure(11);
+imshow(mov(1).cdata);
+colormap gray
+hold on;
+plot(x,y2,'.');
+axis([0 vidWidth 0 vidHeight])
+hold on;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   Video Reproduzindo
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % Size a figure based on the video's width and height.
